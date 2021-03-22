@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Site Development" xsi:noNamespaceSchemaLocation="phpcs.xsd">
+    <description>Coding standard for this project</description>
+
+    <file>../../app</file>
+    <file>../../config</file>
+    <file>../../database</file>
+    <file>../../routes</file>
+    <file>../../tests</file>
+
+    <arg name="extensions" value="php"/>
+
+    <rule ref="PSR2"/>
+</ruleset>

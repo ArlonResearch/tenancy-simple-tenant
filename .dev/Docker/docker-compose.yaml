@@ -1,0 +1,79 @@
+version: '3'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: ./Images/PHP/Dockerfile
+      args:
+        type: fpm
+        version: ${PHP_VERSION-7.4}
+    volumes:
+      - ${APP_PATH-../../}:/var/www/html
+    ports:
+      - "${DOCKER_PORT_PHP-9000}:9000"
+    networks:
+      - application
+
+  mysql:
+    build:
+      context: .
+      dockerfile: ./Images/MySQL/Dockerfile
+    ports:
+      - "${DOCKER_PORT_MYSQL-3306}:3306"
+    volumes:
+      - application-db:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: application
+      MYSQL_USER: application
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+    networks:
+      - application
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./Images/NGINX/Dockerfile
+    ports:
+      - "${DOCKER_PORT_NGINX-1234}:80"
+    volumes:
+      - ${APP_PATH-../../}:/var/www/html
+    depends_on:
+      - php
+      - mysql
+      - composer
+    networks:
+      - application
+
+  composer:
+    build:
+      context: .
+      dockerfile: ./Images/PHP/Dockerfile
+      args:
+        type: cli
+        version: ${PHP_VERSION-7.4}
+    volumes:
+      - ${APP_PATH-../../}:/var/www/html
+    networks:
+      - application
+    command: composer install
+
+  workspace:
+    build:
+      context: .
+      dockerfile: ./Images/Workspace/Dockerfile
+      args:
+        type: cli
+        version: ${PHP_VERSION-7.4}
+    volumes:
+      - ${APP_PATH-../../}:/var/www/html
+    networks:
+      - application
+    tty: true
+
+volumes:
+  application-db:
+
+networks:
+  application:
